@@ -16,6 +16,7 @@ all: $(BIN)
 
 # link object files into final binary
 $(BIN): $(OBJS)
+	@mkdir -p ./bin/
 	$(CC) $(CFLAGS) -o $@ $^
 
 # compile each .c into a .o in build/
