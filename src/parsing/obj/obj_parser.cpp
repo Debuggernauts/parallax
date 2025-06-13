@@ -64,8 +64,6 @@ Mesh Parser::parse() {
                 position++;
             }
 
-            std::cout << "Position { " << "x: " << pos.x << ", " << "y: " << pos.y << ", " << "z: " << pos.z << " }" << std::endl;
-
             positions.push_back(pos);
             continue;
         }
@@ -107,8 +105,6 @@ Mesh Parser::parse() {
                 position++;
             }
 
-            std::cout << "Normal { " << "x: " << norm.x << ", " << "y: " << norm.y << ", " << "z: " << norm.z << " }" << std::endl;
-
             normals.push_back(norm);
             continue;
         }
@@ -134,8 +130,6 @@ Mesh Parser::parse() {
             std::string wNum(v.lexeme, v.len);
             tex.v = std::strtof(wNum.c_str(), nullptr);
             position++;
-
-            std::cout << "Texture { " << "u: " << tex.u << ", " << "v: " << tex.v << " }" << std::endl;
 
             textures.push_back(tex);
             continue;
@@ -213,14 +207,12 @@ Mesh Parser::parse() {
             if (position < tokens.size() && tokens[position].type == SLASH) {
                 position++;
                 if (position < tokens.size() && tokens[position].type == SLASH) {
-                    // v//vn
                     position++;
                     if (tokens[position].type == NUMBER) {
                         face.n3 = std::stoul(std::string(tokens[position].lexeme, tokens[position].len)) - 1;
                         position++;
                     }
                 } else if (tokens[position].type == NUMBER) {
-                    // v/vt or v/vt/vn
                     face.t3 = std::stoul(std::string(tokens[position].lexeme, tokens[position].len)) - 1;
                     position++;
                     if (position < tokens.size() && tokens[position].type == SLASH) {
@@ -233,14 +225,33 @@ Mesh Parser::parse() {
                 }
             }
 
-            std::cout << "Face { " << "v1: " << face.v1 << ", " << "t1: " << face.t1 << ", " << "n1: " << face.n1 << ", " << "v2: " << face.v2 << ", " << "t2: " << face.t2 << ", " << "n2: " << face.n2 <<  ", " << "v3: " << face.v3 << ", " << "t3: " << face.t3 << ", " << "n3: " << face.n3 << " }" << std::endl;
-
             faces.push_back(face);
             continue;
         }
         else {
             position++;
         }
+    }
+
+    for (Position pos : positions) {
+        Vertex vert;
+        vert.position = glm::vec3(pos.x, pos.y, pos.z);
+        mesh.vertices.push_back(vert);
+    }
+
+    for (Face face : faces) {
+        mesh.indices.push_back(face.v1);
+        mesh.indices.push_back(face.v2);
+        mesh.indices.push_back(face.v3);
+        size_t t1 = face.t1, t2 = face.t2, t3 = face.t3; 
+        size_t n1 = face.n1, n2 = face.n2, n3 = face.n3;
+
+        if (t1 != SIZE_MAX) { Texture tex = textures[t1]; mesh.vertices[face.v1].texture = glm::vec2(tex.u, tex.v); }
+        if (t2 != SIZE_MAX) { Texture tex = textures[t2]; mesh.vertices[face.v2].texture = glm::vec2(tex.u, tex.v); }
+        if (t3 != SIZE_MAX) { Texture tex = textures[t3]; mesh.vertices[face.v3].texture = glm::vec2(tex.u, tex.v); }
+        if (n1 != SIZE_MAX) { Normal norm = normals[n1]; mesh.vertices[face.v1].normal = glm::vec3(norm.x, norm.y, norm.z); }
+        if (n2 != SIZE_MAX) { Normal norm = normals[n2]; mesh.vertices[face.v2].normal = glm::vec3(norm.x, norm.y, norm.z); }
+        if (n3 != SIZE_MAX) { Normal norm = normals[n3]; mesh.vertices[face.v3].normal = glm::vec3(norm.x, norm.y, norm.z); }
     }
 
     return mesh;
