@@ -54,6 +54,8 @@ std::vector<Token> Lexer::tokenize() {
                     case 'p':
                         token.type = POINTS;
                         break;
+                    default:
+                        token.type = IDENTIFIER;
                 }
                 token.lexeme = &src[start];
                 token.len = 1;
@@ -78,6 +80,8 @@ std::vector<Token> Lexer::tokenize() {
                     token.type = IDENTIFIER;
                 }
 
+                free(str);
+
                 token.lexeme = &src[start];
                 token.len = 2;
                 tokens.push_back(token);
@@ -97,6 +101,8 @@ std::vector<Token> Lexer::tokenize() {
                 else {
                     token.type = IDENTIFIER;
                 }
+                free(str);
+
                 token.lexeme = &src[start];
                 token.len = 6;
                 tokens.push_back(token);

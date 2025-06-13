@@ -1,6 +1,8 @@
 #ifndef PARSING_TOKEN_HPP
 #define PARSING_TOKEN_HPP
 
+#include <cstddef>
+
 enum TokenType {
     ERROR,
     EOC,
@@ -26,5 +28,7 @@ struct Token {
     const char* lexeme;
     size_t len;
 };
+
+const char* viewTokentype(TokenType);
 
 #endif
